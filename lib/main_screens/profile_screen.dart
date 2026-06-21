@@ -3,6 +3,8 @@ import 'package:digital_preps/main_screens/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../intro_screens/login_screen.dart';
+import '../services/session_manager.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,7 +16,20 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isNotificationEnabled = true;
 
+  @override
+  void initState() {
+    super.initState();
+    print('─────────────────────────────────────────────────');
+    print('👤 PROFILE SCREEN → initState');
+    print('   ➤ Name  : ${SessionManager.userName}');
+    print('   ➤ Email : ${SessionManager.userEmail}');
+    print('   ➤ Role  : ${SessionManager.userRole}');
+    print('   ➤ Type  : ${SessionManager.userType}');
+    print('─────────────────────────────────────────────────');
+  }
+
   void _showLogoutDialog(BuildContext context) {
+    print('🚪 LOGOUT DIALOG → opened');
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -28,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              /// 🔴 Icon Circle
+              // ── Icon ────────────────────────────────────────────
               Container(
                 width: 72,
                 height: 72,
@@ -45,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(height: 16),
 
-              /// Title
+              // ── Title ────────────────────────────────────────────
               Text(
                 'Logout',
                 style: GoogleFonts.inter(
@@ -57,12 +72,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(height: 8),
 
-              /// Message
+              // ── Message ──────────────────────────────────────────
               Text(
                 'Are You Sure You Want To Logout?',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  fontSize: 5,
+                  fontSize: 14,
                   color: Colors.grey.shade600,
                   height: 1.5,
                 ),
@@ -70,13 +85,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(height: 24),
 
-              /// Buttons Row
+              // ── Buttons ──────────────────────────────────────────
               Row(
                 children: [
-                  /// Cancel Button
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        print('🚪 LOGOUT DIALOG → cancelled');
+                        Navigator.of(context).pop();
+                      },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 13),
                         side: BorderSide(color: Colors.grey.shade300),
@@ -97,13 +114,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(width: 12),
 
-                  /// Logout Button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
-                        // 👇 Apna logout logic yahan likhein
-                        // Get.offAllNamed('/login');
+                        print('🗑️  LOGOUT CONFIRMED → clearing session');
+                        SessionManager.clearSession();
+                        print('🚀 NAVIGATING → LoginScreen');
+                        Get.offAll(
+                          const LoginScreen(),
+                          transition: Transition.noTransition,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -114,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: Text(
-                        'Logout',
+                        'Yes',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -137,11 +157,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
 
+    final String displayName = SessionManager.userName.isNotEmpty
+        ? SessionManager.userName
+        : 'User';
+
+    final String displayRole = SessionManager.userRole.isNotEmpty
+        ? SessionManager.userRole
+        : SessionManager.userType.isNotEmpty
+        ? SessionManager.userType
+        : 'Employee';
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          /// 🔵 HEADER
+          // ── Header ──────────────────────────────────────────────
           Container(
             width: double.infinity,
             padding: EdgeInsets.only(
@@ -159,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// PROFILE IMAGE
+                // ── Avatar ────────────────────────────────────────
                 Container(
                   padding: EdgeInsets.all(w * 0.01),
                   decoration: const BoxDecoration(
@@ -168,15 +198,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: CircleAvatar(
                     radius: w * 0.13,
-                    backgroundImage: const AssetImage('assets/images/h1.png'),
+                    backgroundImage:
+                    const AssetImage('assets/images/h1.png'),
                   ),
                 ),
 
                 SizedBox(height: h * 0.02),
 
-                /// NAME
+                // ── Name ──────────────────────────────────────────
                 Text(
-                  'Muhammad Haseeb',
+                  displayName,
                   style: GoogleFonts.inter(
                     fontSize: w * 0.06,
                     fontWeight: FontWeight.w700,
@@ -184,9 +215,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                /// TITLE
+                // ── Role ──────────────────────────────────────────
                 Text(
-                  'UI UX Designer',
+                  displayRole,
                   style: GoogleFonts.inter(
                     fontSize: w * 0.035,
                     fontWeight: FontWeight.w400,
@@ -199,9 +230,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           SizedBox(height: h * 0.05),
 
-          /// EDIT PROFILE TILE
+          // ── Edit Profile Tile ────────────────────────────────────
           GestureDetector(
             onTap: () {
+              print('✏️  EDIT PROFILE → tapped');
               Get.to(
                 EditProfileScreen(),
                 transition: Transition.noTransition,
@@ -260,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
 
-          /// NOTIFICATION TILE
+          // ── Notification Tile ────────────────────────────────────
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: w * 0.01,
@@ -309,9 +341,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       activeTrackColor: Colors.lightBlue,
                       inactiveThumbColor: Colors.white,
                       onChanged: (value) {
-                        setState(() {
-                          isNotificationEnabled = value;
-                        });
+                        print('🔔 NOTIFICATION TOGGLE → $value');
+                        setState(() => isNotificationEnabled = value);
                       },
                     ),
                   ),
@@ -322,10 +353,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           SizedBox(height: h * 0.04),
 
-          /// LOGOUT BUTTON
+          // ── Logout Button ────────────────────────────────────────
           TextButton.icon(
             onPressed: () => _showLogoutDialog(context),
-            icon: Icon(Icons.logout, color: Colors.redAccent, size: w * 0.05),
+            icon: Icon(
+              Icons.logout,
+              color: Colors.redAccent,
+              size: w * 0.05,
+            ),
             label: Text(
               'Logout',
               style: GoogleFonts.inter(
